@@ -43,7 +43,7 @@ namespace SceneLoader
         }
 
         private const string LOADING_TEXT_URL = "http://gsx2json.com/api?id=1WzopQHboEwVm_kaqzgprjL80Anr2plw_R1HLWxVBSdU&sheet=1&columns=false";
-        private const string LOADING_TEXT_FILENAME = "LoadingText.json";
+        private const string LOADING_TEXT_FILENAME = "LoadingText";
 
         private UnityWebRequest _request;
 
@@ -88,11 +88,12 @@ namespace SceneLoader
                 //If request fails, load the cached json from persistent data path.
                 string json = LoadFromFile();
 
-                if (!string.IsNullOrEmpty(json))
-                {
-                    Response response = JsonUtility.FromJson<Response>(json);
-                    loadingTexts = response.rows;
-                }
+                //Elseif no cached json, load from resources.
+                if (string.IsNullOrEmpty(json))
+                    json = Resources.Load<TextAsset>(LOADING_TEXT_FILENAME).text;
+
+                Response response = JsonUtility.FromJson<Response>(json);
+                loadingTexts = response.rows;
             }
             else
             {
@@ -111,7 +112,7 @@ namespace SceneLoader
         //Saves json to peristent data path
         private void SaveToFile(string json)
         {
-            string filePath = Application.persistentDataPath + "/" + LOADING_TEXT_FILENAME;
+            string filePath = Application.persistentDataPath + "/" + LOADING_TEXT_FILENAME + ".json";
             Debug.Log("#LoadingText, Saving json to path: " + filePath);
             File.WriteAllText(filePath, json);
         }
@@ -119,7 +120,7 @@ namespace SceneLoader
         //Loads json from peristent data path
         private string LoadFromFile()
         {
-            string filePath = Application.persistentDataPath + "/" + LOADING_TEXT_FILENAME;
+            string filePath = Application.persistentDataPath + "/" + LOADING_TEXT_FILENAME + ".json";
             Debug.Log("#LoadingText, Loading json from path: " + filePath);
             if (File.Exists(filePath))
                 return File.ReadAllText(filePath);
