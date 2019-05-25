@@ -52,7 +52,7 @@ namespace SceneLoader
                     continue;
                 }
 
-                _view.SetProgress((_sceneLoadingAsyncOperation.progress) * 100);
+                _view.SetProgress((_sceneLoadingAsyncOperation.progress));
 
                 if (_sceneLoadingAsyncOperation.isDone)
                 {
