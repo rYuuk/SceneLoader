@@ -41,7 +41,7 @@ namespace SceneLoader
 
         public void SetProgress(float progress)
         {
-            m_Progress.text = progress + "%";
+            m_Progress.text = Mathf.RoundToInt(progress*100)  + "%";
             m_Slider.value = progress;
         }
 
