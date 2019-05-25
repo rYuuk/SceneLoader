@@ -6,13 +6,15 @@ using SceneLoader;
 public class BasicExample : MonoBehaviour
 {
     [SerializeField] private string sceneName = "SceneB";
+    [SerializeField] private bool allowSceneActivation = true;
 
     private SceneLoaderController _controller;
 
     private void Start()
     {
         _controller = GameObject.FindObjectOfType<SceneLoaderController>();
-        //_controller.onSceneLoadComplete += _controller.ActivateScene;
+        if(allowSceneActivation)
+            _controller.onSceneLoadComplete += _controller.ActivateScene;
     }
 
     public void SwitchScene()

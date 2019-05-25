@@ -42,7 +42,7 @@ namespace SceneLoader
             public List<LoadingText> rows;
         }
 
-        private const string LOADING_TEXT_URL = "http://gsx2json.com/api?id=1WzopQHboEwVm_kaqzgprjL80Anr2plw_R1HLWxVBSdU&sheet=1&columns=false";
+        private const string LOADING_TEXT_URL = "http://ec2-13-250-44-228.ap-southeast-1.compute.amazonaws.com/api?id=1WzopQHboEwVm_kaqzgprjL80Anr2plw_R1HLWxVBSdU&sheet=1&columns=false";
         private const string LOADING_TEXT_FILENAME = "LoadingText";
 
         private UnityWebRequest _request;
