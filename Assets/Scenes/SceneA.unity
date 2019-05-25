@@ -1153,7 +1153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4be2fda537cb67a4d881d5d47a19b567, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneName: SceneB
+  sceneName: Scene_A
   allowSceneActivation: 1
 --- !u!4 &1187958734
 Transform:
