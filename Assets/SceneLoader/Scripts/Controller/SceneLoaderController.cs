@@ -9,9 +9,12 @@ namespace SceneLoader
         [SerializeField] private float m_LoadingTextDuration = 5f;
         [Tooltip("Should loading text be sorted on weight basis.")]
         [SerializeField] private bool m_SortLoadingText = true;
+        [SerializeField] private bool m_ShowFade = true;
+        [SerializeField] private float m_FadeDuration = 1.5f;
 
         private SceneLoaderView _view;
         private SceneLoaderModel _model;
+        private Fade _fade;
 
         private Coroutine _loadingProgressCoroutine;
         private AsyncOperation _sceneLoadingAsyncOperation;
@@ -31,6 +34,9 @@ namespace SceneLoader
             _model = new SceneLoaderModel();
             _view = FindObjectOfType<SceneLoaderView>();
             _view.Configure(m_LoadingTextDuration, m_SortLoadingText);
+
+            _fade = FindObjectOfType<Fade>();
+            _fade.SetFadeDuration(m_FadeDuration);
         }
 
         /// <summary>
@@ -46,11 +52,11 @@ namespace SceneLoader
                     continue;
                 }
 
-                _view.SetProgress((_sceneLoadingAsyncOperation.progress)*100);
+                _view.SetProgress((_sceneLoadingAsyncOperation.progress) * 100);
 
-                if(_sceneLoadingAsyncOperation.isDone)
+                if (_sceneLoadingAsyncOperation.isDone)
                 {
-                    _view.enabled = false;
+                    OnSceneLoadCompleted(null);
                     onSceneLoadComplete?.Invoke();
                     yield break;
                 }
@@ -72,11 +78,26 @@ namespace SceneLoader
         /// <param name="allowSceneActivation">Allow scene to activate immediately after loading is complete.</param>
         /// <param name="isAdditve">Is scene have to be loaded additively.</param>
         /// <returns></returns>
-        public void Load(string sceneName, bool showLoadingView = true, bool allowSceneActivation = true,  bool isAdditve = false)
+        public void Load(string sceneName, bool showLoadingView = true, bool allowSceneActivation = true, bool isAdditve = false)
         {
             if (_loadingProgressCoroutine != null)
                 StopCoroutine(_loadingProgressCoroutine);
 
+            if (m_ShowFade)
+            {
+                _fade.OnComplete = () =>
+                {
+                    _fade.OnComplete = null;
+                    LoadScene(sceneName, showLoadingView, allowSceneActivation, isAdditve);
+                };
+                _fade.FadeIn();
+            }
+            else
+                LoadScene(sceneName, showLoadingView, allowSceneActivation, isAdditve);
+        }
+
+        private void LoadScene(string sceneName, bool showLoadingView, bool allowSceneActivation, bool isAdditve)
+        {
             if (showLoadingView)
             {
                 _view.enabled = true;
@@ -87,7 +108,10 @@ namespace SceneLoader
 
             _sceneLoadingAsyncOperation = SceneLoader.LoadScene(sceneName, isAdditve);
             _sceneLoadingAsyncOperation.allowSceneActivation = allowSceneActivation;
+            if (allowSceneActivation)
+                _sceneLoadingAsyncOperation.completed += OnSceneLoadCompleted;
         }
+
 
         /// <summary>
         /// Call this if 'allowSceneActivation' is true in Load()'s parameters.
@@ -104,6 +128,8 @@ namespace SceneLoader
         {
             _view.enabled = false;
             _sceneLoadingAsyncOperation.completed -= OnSceneLoadCompleted;
+            if (m_ShowFade)
+                _fade.FadeOut();
         }
     }
 }
